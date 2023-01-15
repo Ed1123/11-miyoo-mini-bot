@@ -6,6 +6,8 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
+SECONDS_BETWEEN_REFRESH = 0.5
+
 # Trying to use default profile to avoid having to log in, but doesn't work...
 # options = webdriver.ChromeOptions()
 # options.add_argument(
@@ -35,9 +37,9 @@ input('Log in in the Chrome window that has opened and press enter.')
 
 buy_button = find_buy_button_element()
 
-while buy_button != 'Buy Now':
-    print('No stock yet. Refreshing in 1/2 second.')
-    time.sleep(0.5)
+while buy_button and buy_button.text != 'Buy Now':
+    print(f'No stock yet. Refreshing in {SECONDS_BETWEEN_REFRESH} second(s).')
+    time.sleep(SECONDS_BETWEEN_REFRESH)
     driver.refresh()
     buy_button = find_buy_button_element()
 
