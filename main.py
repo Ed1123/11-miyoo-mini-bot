@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import Optional
 
@@ -14,6 +15,12 @@ SECONDS_BETWEEN_REFRESH = 1.5
 MIYOO_MINI_WEBSITE = 'https://s.click.aliexpress.com/e/_DDDi82J'
 # MIYOO_MINI_WEBSITE = 'https://s.click.aliexpress.com/e/_DBjkjv9'  # test with ANBERNIC RG35XX
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 
 def find_buy_button_element(driver: WebDriver) -> Optional[WebElement]:
     '''Tries tries to find the buy button'''
@@ -24,7 +31,7 @@ def find_buy_button_element(driver: WebDriver) -> Optional[WebElement]:
 
 
 def main():
-    print('Press Ctrl + C at any moment to stop the bot.')
+    logging.info('Starting bot. Press Ctrl + C at any moment to close.')
 
     # Use local profile that saves to local folder
     options = webdriver.ChromeOptions()
@@ -36,15 +43,17 @@ def main():
     # driver.get('https://s.click.aliexpress.com/e/_DBjkjv9')
 
     input(
-        'Press enter to start refreshing.\n'
-        'Login or change the language if necessary\n'
+        'Login or change the language if necessary '
         '(the browser will remember this for the next time you run it).'
+        'Press enter to start refreshing.\n'
     )
 
     buy_button = find_buy_button_element(driver)
 
     while buy_button and buy_button.text != 'Buy Now':
-        print(f'No stock yet. Refreshing in {SECONDS_BETWEEN_REFRESH} second(s).')
+        logging.info(
+            f'No stock yet. Refreshing in {SECONDS_BETWEEN_REFRESH} second(s).'
+        )
         time.sleep(SECONDS_BETWEEN_REFRESH)
         driver.refresh()
         buy_button = find_buy_button_element(driver)
