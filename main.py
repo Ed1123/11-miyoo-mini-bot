@@ -7,24 +7,15 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 SECONDS_BETWEEN_REFRESH = 1.5
+MIYOO_MINI_WEBSITE = 'https://s.click.aliexpress.com/e/_DDDi82J'
+# MIYOO_MINI_WEBSITE = 'https://s.click.aliexpress.com/e/_DBjkjv9'  # test with ANBERNIC RG35XX
 
 
-print('Press Ctrl + C at any moment to stop the bot.')
-
-# Use local profile that saves to local folder
-options = webdriver.ChromeOptions()
-options.add_argument('user-data-dir=profile')
-driver = webdriver.Chrome(options=options)
-
-# Navigate to the Miyoo Mini website
-driver.get('https://s.click.aliexpress.com/e/_DDDi82J')
-# driver.get('https://s.click.aliexpress.com/e/_DBjkjv9') # test with ANBERNIC RG35XX
-
-
-def find_buy_button_element() -> Optional[WebElement]:
+def find_buy_button_element(driver: WebDriver) -> Optional[WebElement]:
     '''Tries tries to find the buy button'''
     try:
         return driver.find_element(By.CLASS_NAME, 'buy-now-wrap')
@@ -32,29 +23,44 @@ def find_buy_button_element() -> Optional[WebElement]:
         return
 
 
-input(
-    'Press enter to start refreshing.\n'
-    'Login or change the language if necessary\n'
-    '(the browser will remember this for the next time you run it).'
-)
+def main():
+    print('Press Ctrl + C at any moment to stop the bot.')
 
-buy_button = find_buy_button_element()
+    # Use local profile that saves to local folder
+    options = webdriver.ChromeOptions()
+    options.add_argument('user-data-dir=profile')
+    driver = webdriver.Chrome(options=options)
 
-while buy_button and buy_button.text != 'Buy Now':
-    print(f'No stock yet. Refreshing in {SECONDS_BETWEEN_REFRESH} second(s).')
-    time.sleep(SECONDS_BETWEEN_REFRESH)
-    driver.refresh()
-    buy_button = find_buy_button_element()
+    # Navigate to the Miyoo Mini website
+    driver.get(MIYOO_MINI_WEBSITE)
+    # driver.get('https://s.click.aliexpress.com/e/_DBjkjv9')
 
-    # just for when the element is not attached
-    if buy_button:
-        try:
-            buy_button.text
-        except StaleElementReferenceException:
-            driver.refresh()
-            buy_button = find_buy_button_element()
+    input(
+        'Press enter to start refreshing.\n'
+        'Login or change the language if necessary\n'
+        '(the browser will remember this for the next time you run it).'
+    )
+
+    buy_button = find_buy_button_element(driver)
+
+    while buy_button and buy_button.text != 'Buy Now':
+        print(f'No stock yet. Refreshing in {SECONDS_BETWEEN_REFRESH} second(s).')
+        time.sleep(SECONDS_BETWEEN_REFRESH)
+        driver.refresh()
+        buy_button = find_buy_button_element(driver)
+
+        # just for when the element is not attached
+        if buy_button:
+            try:
+                buy_button.text
+            except StaleElementReferenceException:
+                driver.refresh()
+                buy_button = find_buy_button_element(driver)
+
+    input('It seems there is stock! BUY QUICKLY! (double enter to quick)')
+    input()
+    driver.quit()
 
 
-input('It seems there is stock! BUY QUICKLY! (double enter to quick)')
-input()
-driver.quit()
+if __name__ == '__main__':
+    main()
