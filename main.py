@@ -1,6 +1,5 @@
 import logging
 import time
-from typing import Optional
 
 from selenium import webdriver
 from selenium.common.exceptions import (
@@ -22,12 +21,16 @@ logging.basicConfig(
 )
 
 
-def find_buy_button_element(driver: WebDriver) -> Optional[WebElement]:
+def find_buy_button_element(driver: WebDriver) -> WebElement:
     '''Tries tries to find the buy button'''
+    element = driver.find_element(By.CLASS_NAME, 'buy-now-wrap')
     try:
-        return driver.find_element(By.CLASS_NAME, 'buy-now-wrap')
-    except NoSuchElementException:
-        return
+        element.text
+    except (StaleElementReferenceException, NoSuchElementException):
+        logging.info('Could not find buy button, refreshing.')
+        driver.refresh()
+        element = find_buy_button_element(driver)
+    return element
 
 
 def main():
@@ -45,26 +48,18 @@ def main():
     input(
         'Login or change the language if necessary '
         '(the browser will remember this for the next time you run it).'
-        'Press enter to start refreshing.\n'
+        'Press enter to start refreshing...'
     )
 
     buy_button = find_buy_button_element(driver)
 
-    while buy_button and buy_button.text != 'Buy Now':
+    while buy_button.text != 'Buy Now':
         logging.info(
             f'No stock yet. Refreshing in {SECONDS_BETWEEN_REFRESH} second(s).'
         )
         time.sleep(SECONDS_BETWEEN_REFRESH)
         driver.refresh()
         buy_button = find_buy_button_element(driver)
-
-        # just for when the element is not attached
-        if buy_button:
-            try:
-                buy_button.text
-            except StaleElementReferenceException:
-                driver.refresh()
-                buy_button = find_buy_button_element(driver)
 
     input('It seems there is stock! BUY QUICKLY! (double enter to quick)')
     input()
