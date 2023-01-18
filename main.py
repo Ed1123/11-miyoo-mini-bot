@@ -53,15 +53,20 @@ class Bot:
             self.driver.refresh()
             buy_button = self.__find_buy_button_element()
 
-    def __find_element(self, by: str, value: str) -> WebElement:
+    def __find_element(
+        self, by: str, value: str, refresh_wait_time_seconds: float = 0.5
+    ) -> WebElement:
         '''Tries to find element button'''
         try:
             element = self.driver.find_element(by, value)
             element.text
         except (StaleElementReferenceException, NoSuchElementException):
-            logging.info('Could not find buy button, refreshing.')
+            logging.info(
+                f'Could not find element, refreshing and waiting {refresh_wait_time_seconds} seconds.'
+            )
             self.driver.refresh()
-            element = self.__find_buy_button_element()
+            time.sleep(refresh_wait_time_seconds)
+            element = self.__find_element(by, value, refresh_wait_time_seconds + 0.5)
         return element
 
     def __find_buy_button_element(self) -> WebElement:
@@ -81,8 +86,8 @@ class Bot:
         # Click to confirm the buy
         logging.info('Clicking confirm button')
         confirm_button = self.__find_element(
-            By.CLASS_NAME,
-            'comet-btn comet-btn-primary comet-btn-large pl-order-toal-container__btn',
+            By.CSS_SELECTOR,
+            '#placeorder_wrap__inner > div > div.pl-side-container > div.pl-wrap-container > div > div > div.pl-order-toal-container__btn-box > button',
         )
         confirm_button.click()
 
