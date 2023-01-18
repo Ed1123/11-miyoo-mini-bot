@@ -54,8 +54,8 @@ class Bot:
 
     def __find_buy_button_element__(self) -> WebElement:
         '''Tries tries to find the buy button'''
-        element = self.driver.find_element(By.CLASS_NAME, 'buy-now-wrap')
         try:
+            element = self.driver.find_element(By.CLASS_NAME, 'buy-now-wrap')
             element.text
         except (StaleElementReferenceException, NoSuchElementException):
             logging.info('Could not find buy button, refreshing.')
