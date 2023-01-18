@@ -63,8 +63,12 @@ class Bot:
             element = self.__find_buy_button_element__()
         return element
 
+    def quit(self):
+        logging.info('Closing bot.')
+        self.driver.quit()
+
     def __buy__(self):
-        ...
+        raise NotImplementedError
 
     def start_without_buying(self):
         try:
@@ -73,14 +77,15 @@ class Bot:
             input('It seems there is stock! BUY QUICKLY! (double enter to quick)')
             input()
         except KeyboardInterrupt:
-            logging.info('Closing bot.')
-            self.driver.quit()
+            self.quit()
 
     def start_with_buying(self):
-        self.__start_bot__()
-        self.__check_stock__()
-        self.__buy__()
-        self.driver.quit()
+        try:
+            self.__start_bot__()
+            self.__check_stock__()
+            self.__buy__()
+        except KeyboardInterrupt:
+            self.quit()
 
 
 def main():
