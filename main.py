@@ -17,6 +17,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[logging.FileHandler("debug.log"), logging.StreamHandler()],
 )
 # disable logging for urllib3
 logging.getLogger("urllib3").propagate = False
